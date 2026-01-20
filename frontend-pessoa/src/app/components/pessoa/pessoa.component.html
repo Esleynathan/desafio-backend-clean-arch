@@ -1,102 +1,335 @@
-<div class="container">
-  <h2>Gerenciamento de Pessoas</h2>
+<div class="min-h-screen bg-gray-100 py-8">
+  <div class="max-w-5xl mx-auto px-4">
 
-  <!-- Formulário de Cadastro/Edição -->
-  <div class="card">
-    <h3>{{ pessoa.id ? 'Editar Pessoa' : 'Nova Pessoa' }}</h3>
-    <form (ngSubmit)="salvar()">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="nome">Nome:</label>
-          <input type="text" id="nome" name="nome" [(ngModel)]="pessoa.nome" required placeholder="Ex: João Silva">
-        </div>
-        <div class="form-group">
-          <label for="cpf">CPF:</label>
-          <input type="text" id="cpf" name="cpf" [(ngModel)]="pessoa.cpf" required placeholder="000.000.000-00">
-        </div>
-      </div>
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">Gerenciamento de Pessoas</h1>
+      <p class="text-gray-500 mt-1">Cadastre, edite e gerencie pessoas no sistema</p>
+    </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="data_nascimento">Data de Nascimento:</label>
-          <input type="date" id="data_nascimento" name="data_nascimento" [(ngModel)]="pessoa.data_nascimento" required>
+    <!-- Formulário de Cadastro/Edição -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+          <span class="text-blue-600 text-xl">{{ pessoa.id ? '✏️' : '➕' }}</span>
         </div>
-        <div class="form-group">
-          <label for="sexo">Sexo:</label>
-          <select id="sexo" name="sexo" [(ngModel)]="pessoa.sexo" required>
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
-          </select>
+        <div>
+          <h2 class="text-xl font-semibold text-gray-800">{{ pessoa.id ? 'Editar Pessoa' : 'Nova Pessoa' }}</h2>
+          <p class="text-sm text-gray-500">{{ pessoa.id ? 'Atualize os dados abaixo' : 'Preencha os dados para cadastrar' }}</p>
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="altura">Altura (m):</label>
-          <input type="number" step="0.01" id="altura" name="altura" [(ngModel)]="pessoa.altura" required placeholder="Ex: 1.75">
+      <form (ngSubmit)="salvar()">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Nome -->
+          <div class="lg:col-span-2">
+            <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+            <input type="text" id="nome" name="nome" [(ngModel)]="pessoa.nome" required
+              placeholder="Digite o nome completo"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+          </div>
+
+          <!-- CPF -->
+          <div>
+            <label for="cpf" class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
+            <input type="text" id="cpf" name="cpf" [ngModel]="pessoa.cpf" (input)="formatarCPF($event)" required
+              placeholder="000.000.000-00" maxlength="14"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono tracking-wider">
+          </div>
+
+          <!-- Data de Nascimento -->
+          <div>
+            <label for="data_nascimento" class="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
+            <input type="date" id="data_nascimento" name="data_nascimento" [(ngModel)]="pessoa.data_nascimento" required
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer hover:border-blue-400"
+              max="2026-01-20">
+          </div>
+
+          <!-- Sexo -->
+          <div>
+            <label for="sexo" class="block text-sm font-medium text-gray-700 mb-1">Sexo</label>
+            <select id="sexo" name="sexo" [(ngModel)]="pessoa.sexo" required
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white">
+              <option value="" disabled>Selecione...</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+            </select>
+          </div>
+
+          <!-- Altura -->
+          <div>
+            <label for="altura" class="block text-sm font-medium text-gray-700 mb-1">Altura (m)</label>
+            <div class="relative">
+              <input type="text" id="altura" name="altura" [ngModel]="pessoa.altura" (input)="formatarAltura($event)" required
+                placeholder="1.75" maxlength="4"
+                class="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">m</span>
+            </div>
+          </div>
+
+          <!-- Peso -->
+          <div>
+            <label for="peso" class="block text-sm font-medium text-gray-700 mb-1">Peso (kg)</label>
+            <div class="relative">
+              <input type="text" id="peso" name="peso" [ngModel]="pessoa.peso" (input)="formatarPeso($event)" required
+                placeholder="70.5" maxlength="5"
+                class="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">kg</span>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="peso">Peso (kg):</label>
-          <input type="number" step="0.1" id="peso" name="peso" [(ngModel)]="pessoa.peso" required placeholder="Ex: 70.5">
-        </div>
-      </div>
 
-      <div class="actions">
-        <button type="submit" class="btn-save">{{ pessoa.id ? 'Atualizar' : 'Cadastrar' }}</button>
-        <button type="button" class="btn-cancel" (click)="limparFormulario()" *ngIf="pessoa.id">Cancelar Edição</button>
-      </div>
-    </form>
-  </div>
-
-  <hr>
-
-  <!-- Barra de Pesquisa -->
-  <div class="search-bar">
-    <input type="text" name="termoBusca" placeholder="Pesquisar por nome..." [(ngModel)]="termoBusca">
-    <button (click)="pesquisar()">Pesquisar</button>
-    <button class="btn-cancel" (click)="limparPesquisa()">Limpar</button>
-  </div>
-
-  <!-- Tabela de Listagem -->
-  <h3>Lista de Pessoas</h3>
-  <table class="tabela-pessoas">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>CPF</th>
-        <th>Nascimento</th>
-        <th>Sexo</th>
-        <th>Altura</th>
-        <th>Peso</th>
-        <th>Peso Ideal</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of pessoas">
-        <td>{{ p.nome }}</td>
-        <td>{{ p.cpf }}</td>
-        <td>{{ p.data_nascimento | date:'dd/MM/yyyy' }}</td>
-        <td>{{ p.sexo === 'M' ? 'Masculino' : 'Feminino' }}</td>
-        <td>{{ p.altura }} m</td>
-        <td>{{ p.peso }} kg</td>
-        <td>
-          <!-- Exibe o peso ideal formatado se existir -->
-          <span *ngIf="p.peso_ideal" style="font-weight: bold; color: green;">
-            {{ p.peso_ideal | number:'1.2-2' }} kg
-          </span>
-          <button *ngIf="!p.peso_ideal" class="btn-calc" (click)="calcularPeso(p)" title="Clique para calcular">
-            Calcular
+        <!-- Botões do Formulário -->
+        <div class="flex gap-3 mt-6 pt-4 border-t border-gray-200">
+          <button type="submit"
+            class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2.5 rounded-lg transition-all shadow-sm hover:shadow">
+            <span>{{ pessoa.id ? '💾' : '✓' }}</span>
+            {{ pessoa.id ? 'Salvar Alterações' : 'Cadastrar Pessoa' }}
           </button>
-        </td>
-        <td>
-          <button class="btn-edit" (click)="editar(p)">Editar</button>
-          <button class="btn-delete" (click)="excluir(p.id!)">Excluir</button>
-        </td>
-      </tr>
-      <tr *ngIf="pessoas.length === 0">
-        <td colspan="8" style="text-align: center; padding: 20px;">Nenhuma pessoa cadastrada.</td>
-      </tr>
-    </tbody>
-  </table>
+          <button type="button" *ngIf="pessoa.id" (click)="limparFormulario()"
+            class="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-5 py-2.5 rounded-lg transition-all">
+            <span>✕</span>
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Seção de Pesquisa e Lista -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <!-- Barra de Pesquisa -->
+      <div class="p-4 bg-gray-50 border-b border-gray-200">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="flex-1 relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            <input type="text" name="termoBusca" placeholder="Pesquisar por nome..." [(ngModel)]="termoBusca"
+              class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+          </div>
+          <div class="flex gap-2">
+            <button (click)="pesquisar()"
+              class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-lg transition-all shadow-sm hover:shadow">
+              Pesquisar
+            </button>
+            <button (click)="limparPesquisa()"
+              class="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-5 py-2.5 rounded-lg transition-all">
+              Limpar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header da Tabela -->
+      <div class="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="font-semibold text-gray-700">Lista de Pessoas</h3>
+        <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{{ pessoas.length }} registro(s)</span>
+      </div>
+
+      <!-- Tabela -->
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-700 text-white">
+            <tr>
+              <th class="px-4 py-3 text-left text-sm font-semibold">Nome</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold">CPF</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold">Nascimento</th>
+              <th class="px-4 py-3 text-center text-sm font-semibold">Sexo</th>
+              <th class="px-4 py-3 text-center text-sm font-semibold">Altura</th>
+              <th class="px-4 py-3 text-center text-sm font-semibold">Peso</th>
+              <th class="px-4 py-3 text-center text-sm font-semibold">Peso Ideal</th>
+              <th class="px-4 py-3 text-center text-sm font-semibold">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let p of pessoas" class="hover:bg-blue-50 transition-colors">
+              <td class="px-4 py-3">
+                <span class="font-medium text-gray-800">{{ p.nome }}</span>
+              </td>
+              <td class="px-4 py-3 text-gray-600 font-mono text-sm">{{ p.cpf }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ p.data_nascimento | date:'dd/MM/yyyy' }}</td>
+              <td class="px-4 py-3 text-center">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [ngClass]="p.sexo === 'M' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'">
+                  {{ p.sexo === 'M' ? '♂ Masc' : '♀ Fem' }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center text-gray-600">{{ p.altura }} m</td>
+              <td class="px-4 py-3 text-center text-gray-600">{{ p.peso }} kg</td>
+              <td class="px-4 py-3 text-center">
+                <span *ngIf="p.peso_ideal" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                  ✓ {{ p.peso_ideal | number:'1.2-2' }} kg
+                </span>
+                <button *ngIf="!p.peso_ideal" (click)="calcularPeso(p)" title="Calcular peso ideal"
+                  class="bg-teal-500 hover:bg-teal-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-all">
+                  Calcular
+                </button>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex justify-center gap-1">
+                  <button (click)="editar(p)" title="Editar"
+                    class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all">
+                    ✏️
+                  </button>
+                  <button (click)="excluir(p.id!)" title="Excluir"
+                    class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all">
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <!-- Estado inicial: nenhuma pesquisa realizada -->
+            <tr *ngIf="pessoas.length === 0 && !pesquisaRealizada">
+              <td colspan="8" class="text-center py-12">
+                <div class="text-gray-400">
+                  <span class="text-4xl block mb-2">🔍</span>
+                  <p class="font-medium">Realize uma pesquisa</p>
+                  <p class="text-sm">Use o campo acima para buscar pessoas cadastradas</p>
+                </div>
+              </td>
+            </tr>
+            <!-- Pesquisa realizada sem resultados -->
+            <tr *ngIf="pessoas.length === 0 && pesquisaRealizada">
+              <td colspan="8" class="text-center py-12">
+                <div class="text-gray-400">
+                  <span class="text-4xl block mb-2">📋</span>
+                  <p class="font-medium">Nenhum resultado encontrado</p>
+                  <p class="text-sm">Tente uma busca diferente ou cadastre uma nova pessoa</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast de Notificação -->
+<div *ngIf="toast.show"
+  class="fixed bottom-6 right-6 z-50 animate-slide-up">
+  <div class="flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl"
+    [ngClass]="{
+      'bg-green-600 text-white': toast.type === 'success',
+      'bg-red-600 text-white': toast.type === 'error',
+      'bg-blue-600 text-white': toast.type === 'info'
+    }">
+    <span class="text-xl">
+      {{ toast.type === 'success' ? '✓' : toast.type === 'error' ? '✕' : 'ℹ' }}
+    </span>
+    <span class="font-medium">{{ toast.message }}</span>
+  </div>
+</div>
+
+<!-- Modal de Confirmação (Exclusão) -->
+<div *ngIf="confirmModal.show" class="fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeConfirmModal()"></div>
+
+  <!-- Modal -->
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-scale-up">
+    <!-- Header -->
+    <div class="bg-red-50 px-6 py-4 border-b border-red-100">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+          <span class="text-2xl">⚠️</span>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800">{{ confirmModal.title }}</h3>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="px-6 py-5">
+      <p class="text-gray-600">{{ confirmModal.message }}</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">
+      <button (click)="closeConfirmModal()"
+        class="px-5 py-2.5 rounded-lg font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 transition-all">
+        Cancelar
+      </button>
+      <button (click)="confirmAction()"
+        class="px-5 py-2.5 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-all shadow-sm">
+        Sim, Excluir
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Peso Ideal -->
+<div *ngIf="pesoIdealModal.show" class="fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closePesoIdealModal()"></div>
+
+  <!-- Modal -->
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-scale-up">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-5 text-white">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+          <span class="text-2xl">⚖️</span>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold">Peso Ideal Calculado</h3>
+          <p class="text-teal-100 text-sm">{{ pesoIdealModal.nome }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="px-6 py-8 text-center">
+      <div class="mb-4">
+        <span class="text-6xl font-bold text-teal-600">{{ pesoIdealModal.pesoIdeal | number:'1.2-2' }}</span>
+        <span class="text-2xl text-gray-500 ml-2">kg</span>
+      </div>
+      <p class="text-gray-600">{{ pesoIdealModal.mensagem }}</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-4 bg-gray-50 flex justify-center">
+      <button (click)="closePesoIdealModal()"
+        class="px-8 py-2.5 rounded-lg font-medium text-white bg-teal-600 hover:bg-teal-700 transition-all shadow-sm">
+        Entendido
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Feedback (Sucesso/Erro) -->
+<div *ngIf="feedbackModal.show" class="fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Overlay mais transparente -->
+  <div class="absolute inset-0 bg-black/30" (click)="closeFeedbackModal()"></div>
+
+  <!-- Modal -->
+  <div class="relative bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 overflow-hidden animate-scale-up">
+    <!-- Header -->
+    <div class="px-5 py-4 border-b"
+      [ngClass]="feedbackModal.type === 'success' ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center"
+          [ngClass]="feedbackModal.type === 'success' ? 'bg-green-100' : 'bg-red-100'">
+          <span class="text-xl">{{ feedbackModal.type === 'success' ? '✓' : '✕' }}</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">{{ feedbackModal.title }}</h3>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="px-5 py-4">
+      <ul class="space-y-1">
+        <li *ngFor="let msg of feedbackModal.messages" class="text-gray-600 text-sm">
+          {{ msg }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-5 py-3 bg-gray-50 flex justify-end">
+      <button (click)="closeFeedbackModal()"
+        class="px-6 py-2 rounded-lg font-medium text-white transition-all"
+        [ngClass]="feedbackModal.type === 'success' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'">
+        OK
+      </button>
+    </div>
+  </div>
 </div>
