@@ -36,14 +36,21 @@ class PessoaTask:
         # pessoa.save()
         # return True
 
-    def pesquisar(self, id: Optional[int] = None, termo: Optional[str] = None) -> List[Pessoa]:
+    def pesquisar(self, id: Optional[int] = None, termo: Optional[str] = None, sexo: Optional[str] = None) -> List[Pessoa]:
         # Sugestão para implementação futura: filtrar apenas ativos
         # queryset = Pessoa.objects.filter(is_ativo=True)
         if id:
             return [Pessoa.objects.get(id=id)]
+        
+        queryset = Pessoa.objects.all()
+        
         if termo:
-            return list(Pessoa.objects.filter(nome__icontains=termo))
-        return list(Pessoa.objects.all())
+            queryset = queryset.filter(nome__icontains=termo)
+            
+        if sexo:
+            queryset = queryset.filter(sexo=sexo)
+            
+        return list(queryset)
 
     def calcular_peso_ideal(self, id: int) -> float:
         pessoa = Pessoa.objects.get(id=id)

@@ -7,17 +7,44 @@ from pessoa.dtos import PessoaDTO
 
 
 class PessoaController(APIView):
-    
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = PessoaService()
 
     def get(self, request):
-        """Pesquisar - Lista todas as pessoas"""
-        termo = request.query_params.get('search')
-        pessoas = self.service.pesquisar(termo=termo)
-        serializer = PessoaSerializer(pessoas, many=True)
-        return Response(serializer.data)
+        """Pesquisar - Lista todas as pessoas com paginação e filtros"""
+        # Filtros
+        termo = request.query_params.get('search', '')
+        sexo = request.query_params.get('sexo', '')
+
+        # Paginação
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 10))
+
+        # Busca com filtros
+        pessoas = self.service.pesquisar(termo=termo, sexo=sexo)
+
+        # Calcula paginação
+        total = len(pessoas)
+        total_pages = (total + page_size - 1) // page_size if total > 0 else 1
+        start = (page - 1) * page_size
+        end = start + page_size
+        pessoas_paginadas = pessoas[start:end]
+
+        serializer = PessoaSerializer(pessoas_paginadas, many=True)
+
+        return Response({
+            'data': serializer.data,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total,
+                'total_pages': total_pages,
+                'has_next': page < total_pages,
+                'has_previous': page > 1
+            }
+        })
 
     def post(self, request):
         """Incluir - Cria nova pessoa"""

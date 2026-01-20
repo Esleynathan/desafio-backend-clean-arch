@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PessoaService } from '../../services/pessoa.service';
+import { PessoaService, PaginatedResponse } from '../../services/pessoa.service';
 import { Pessoa } from '../../models/pessoa.model';
 
 @Component({
@@ -15,6 +15,14 @@ export class PessoaComponent implements OnInit {
   // Lista de pessoas para exibir na tabela
   pessoas: Pessoa[] = [];
   termoBusca: string = '';
+  filtroSexo: string = ''; // Novo filtro
+  
+  // Paginação
+  paginaAtual: number = 1;
+  tamanhoPagina: number = 10;
+  totalRegistros: number = 0;
+  totalPaginas: number = 0;
+  
   pesquisaRealizada: boolean = false;
 
   // Objeto para o formulário (criação ou edição)
@@ -70,9 +78,10 @@ export class PessoaComponent implements OnInit {
   // Exibe toast de notificação
   showToast(message: string, type: 'success' | 'error' | 'info' = 'success'): void {
     this.toast = { show: true, message, type };
+    this.cdr.markForCheck();
     setTimeout(() => {
       this.toast.show = false;
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }, 3000);
   }
 
@@ -100,6 +109,7 @@ export class PessoaComponent implements OnInit {
   // Abre modal de feedback
   showFeedbackModal(type: 'success' | 'error', title: string, messages: string[]): void {
     this.feedbackModal = { show: true, type, title, messages };
+    this.cdr.markForCheck();
   }
 
   // Fecha modal de feedback
@@ -109,8 +119,13 @@ export class PessoaComponent implements OnInit {
 
   // Busca a lista do backend
   listar(): void {
-    this.pessoaService.listar().subscribe({
-      next: (dados) => this.pessoas = dados,
+    this.pessoaService.listar(this.paginaAtual, this.tamanhoPagina, this.termoBusca, this.filtroSexo).subscribe({
+      next: (resposta: PaginatedResponse<Pessoa>) => {
+        this.pessoas = resposta.data;
+        this.totalRegistros = resposta.pagination.total;
+        this.totalPaginas = resposta.pagination.total_pages;
+        this.cdr.markForCheck();
+      },
       error: (erro) => {
         console.error('Erro ao listar pessoas:', erro);
         this.showToast('Erro ao carregar lista de pessoas', 'error');
@@ -151,29 +166,34 @@ export class PessoaComponent implements OnInit {
 
   // Decide se cria ou atualiza baseado na presença do ID
   salvar(): void {
+    console.log('=== SALVAR CLICADO ===');
     console.log('Dados sendo enviados:', JSON.stringify(this.pessoa, null, 2));
     if (this.pessoa.id) {
       this.pessoaService.atualizar(this.pessoa).subscribe({
         next: () => {
-          this.listar();
+          console.log('=== ATUALIZAR: SUCESSO ===');
           this.limparFormulario();
           this.showFeedbackModal('success', 'Sucesso', ['Pessoa atualizada com sucesso!']);
+          console.log('=== MODAL SUCESSO CHAMADO ===', this.feedbackModal);
         },
         error: (erro) => {
-          console.error('Erro ao atualizar:', erro);
+          console.error('=== ATUALIZAR: ERRO ===', erro);
           this.tratarErro(erro, 'Erro ao atualizar');
+          console.log('=== MODAL ERRO CHAMADO ===', this.feedbackModal);
         }
       });
     } else {
       this.pessoaService.criar(this.pessoa).subscribe({
         next: () => {
-          this.listar();
+          console.log('=== CRIAR: SUCESSO ===');
           this.limparFormulario();
           this.showFeedbackModal('success', 'Sucesso', ['Pessoa cadastrada com sucesso!']);
+          console.log('=== MODAL SUCESSO CHAMADO ===', this.feedbackModal);
         },
         error: (erro) => {
-          console.error('Erro ao cadastrar:', erro);
+          console.error('=== CRIAR: ERRO ===', erro);
           this.tratarErro(erro, 'Erro ao cadastrar');
+          console.log('=== MODAL ERRO CHAMADO ===', this.feedbackModal);
         }
       });
     }
@@ -227,6 +247,7 @@ export class PessoaComponent implements OnInit {
             pesoIdeal: dados.peso_ideal,
             mensagem: dados.mensagem
           };
+          this.cdr.markForCheck();
         },
         error: (erro) => {
           console.error('Erro ao calcular peso ideal:', erro);
@@ -237,19 +258,26 @@ export class PessoaComponent implements OnInit {
   }
 
   pesquisar(): void {
-    this.pessoaService.pesquisar(this.termoBusca).subscribe({
-      next: (dados) => {
-        this.pessoas = dados;
+    console.log('=== PESQUISAR CLICADO ===');
+    this.paginaAtual = 1; // Volta para a primeira página ao filtrar
+    
+    this.pessoaService.listar(this.paginaAtual, this.tamanhoPagina, this.termoBusca, this.filtroSexo).subscribe({
+      next: (resposta: PaginatedResponse<Pessoa>) => {
+        this.pessoas = resposta.data;
+        this.totalRegistros = resposta.pagination.total;
+        this.totalPaginas = resposta.pagination.total_pages;
         this.pesquisaRealizada = true;
-        this.cdr.detectChanges();
-        if (dados.length === 0) {
+        this.cdr.markForCheck();
+        
+        if (this.pessoas.length === 0) {
           this.showToast('Nenhum resultado encontrado', 'info');
         } else {
-          this.showToast(`${dados.length} pessoa(s) encontrada(s)`, 'success');
+          this.showToast(`${this.totalRegistros} pessoa(s) encontrada(s)`, 'success');
         }
+        console.log('=== TOAST CHAMADO ===', this.toast);
       },
       error: (erro) => {
-        console.error('Erro na busca:', erro);
+        console.error('=== PESQUISAR: ERRO ===', erro);
         this.showToast('Erro ao pesquisar', 'error');
       }
     });
@@ -257,9 +285,18 @@ export class PessoaComponent implements OnInit {
 
   limparPesquisa(): void {
     this.termoBusca = '';
-    this.pessoas = [];
+    this.filtroSexo = '';
+    this.paginaAtual = 1;
     this.pesquisaRealizada = false;
+    this.listar(); // Recarrega a lista completa
     this.showToast('Pesquisa limpa', 'info');
+  }
+
+  mudarPagina(novaPagina: number): void {
+    if (novaPagina >= 1 && novaPagina <= this.totalPaginas) {
+      this.paginaAtual = novaPagina;
+      this.listar();
+    }
   }
 
   // Máscara para CPF: 000.000.000-00

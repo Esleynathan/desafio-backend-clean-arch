@@ -17,8 +17,8 @@ class PessoaService:
     def excluir(self, id: int) -> bool:
         return self.task.excluir(id)
 
-    def pesquisar(self, id: Optional[int] = None, termo: Optional[str] = None) -> List[Pessoa]:
-        return self.task.pesquisar(id, termo)
+    def pesquisar(self, id=None, termo=None, sexo=None):
+            return self.task.pesquisar(id=id, termo=termo, sexo=sexo)
 
     def calcular_peso_ideal(self, id: int) -> float:
         return self.task.calcular_peso_ideal(id)
