@@ -32,9 +32,11 @@ class PessoaTask:
         pessoa.delete()
         return True
 
-    def pesquisar(self, id: Optional[int] = None) -> List[Pessoa]:
+    def pesquisar(self, id: Optional[int] = None, termo: Optional[str] = None) -> List[Pessoa]:
         if id:
             return [Pessoa.objects.get(id=id)]
+        if termo:
+            return list(Pessoa.objects.filter(nome__icontains=termo))
         return list(Pessoa.objects.all())
 
     def calcular_peso_ideal(self, id: int) -> float:

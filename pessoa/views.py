@@ -14,7 +14,8 @@ class PessoaController(APIView):
 
     def get(self, request):
         """Pesquisar - Lista todas as pessoas"""
-        pessoas = self.service.pesquisar()
+        termo = request.query_params.get('search')
+        pessoas = self.service.pesquisar(termo=termo)
         serializer = PessoaSerializer(pessoas, many=True)
         return Response(serializer.data)
 
@@ -53,7 +54,12 @@ class PessoaDetailController(APIView):
 
     def put(self, request, id):
         """Alterar - Atualiza pessoa existente"""
-        serializer = PessoaSerializer(data=request.data)
+        try:
+            pessoa_existente = self.service.pesquisar(id)[0]
+        except:
+            return Response({'erro': 'Pessoa não encontrada'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PessoaSerializer(pessoa_existente, data=request.data)
         serializer.is_valid(raise_exception=True)
         
         dto = PessoaDTO(
@@ -65,12 +71,9 @@ class PessoaDetailController(APIView):
             altura=serializer.validated_data['altura'],
             peso=serializer.validated_data['peso']
         )
-        
-        try:
-            pessoa = self.service.alterar(dto)
-            return Response(PessoaSerializer(pessoa).data)
-        except:
-            return Response({'erro': 'Pessoa não encontrada'}, status=status.HTTP_404_NOT_FOUND)
+
+        pessoa = self.service.alterar(dto)
+        return Response(PessoaSerializer(pessoa).data)
 
     def delete(self, request, id):
         """Excluir - Remove pessoa"""
