@@ -288,7 +288,9 @@ export class PessoaComponent implements OnInit {
     this.filtroSexo = '';
     this.paginaAtual = 1;
     this.pesquisaRealizada = false;
-    this.listar(); // Recarrega a lista completa
+    this.pessoas = [];
+    this.totalRegistros = 0;
+    this.totalPaginas = 0;
     this.showToast('Pesquisa limpa', 'info');
   }
 
