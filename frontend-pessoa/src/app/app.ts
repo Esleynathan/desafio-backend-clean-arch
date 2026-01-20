@@ -9,4 +9,5 @@ import { RouterOutlet } from '@angular/router';
 })
 export class App {
   protected readonly title = signal('frontend-pessoa');
+  anoAtual: number = new Date().getFullYear();
 }

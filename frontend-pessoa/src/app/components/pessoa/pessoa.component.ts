@@ -16,6 +16,9 @@ export class PessoaComponent implements OnInit {
   pessoas: Pessoa[] = [];
   termoBusca: string = '';
   filtroSexo: string = ''; // Novo filtro
+
+  anoAtual: number = new Date().getFullYear();
+
   
   // Paginação
   paginaAtual: number = 1;
@@ -172,9 +175,9 @@ export class PessoaComponent implements OnInit {
       this.pessoaService.atualizar(this.pessoa).subscribe({
         next: () => {
           console.log('=== ATUALIZAR: SUCESSO ===');
-          this.limparFormulario();
           this.showFeedbackModal('success', 'Sucesso', ['Pessoa atualizada com sucesso!']);
           console.log('=== MODAL SUCESSO CHAMADO ===', this.feedbackModal);
+          this.limparFormulario();
         },
         error: (erro) => {
           console.error('=== ATUALIZAR: ERRO ===', erro);
@@ -186,9 +189,9 @@ export class PessoaComponent implements OnInit {
       this.pessoaService.criar(this.pessoa).subscribe({
         next: () => {
           console.log('=== CRIAR: SUCESSO ===');
-          this.limparFormulario();
           this.showFeedbackModal('success', 'Sucesso', ['Pessoa cadastrada com sucesso!']);
           console.log('=== MODAL SUCESSO CHAMADO ===', this.feedbackModal);
+          this.limparFormulario();
         },
         error: (erro) => {
           console.error('=== CRIAR: ERRO ===', erro);
