@@ -12,6 +12,7 @@ class Pessoa(models.Model):
     sexo = models.CharField(max_length=1, choices=SEXO_CHOICES)
     altura = models.FloatField()
     peso = models.FloatField()
+    is_ativo = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'pessoa'

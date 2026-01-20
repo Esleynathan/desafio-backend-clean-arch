@@ -31,8 +31,14 @@ class PessoaTask:
         pessoa = Pessoa.objects.get(id=id)
         pessoa.delete()
         return True
+        # Sugestão para implementação futura: Exclusão Lógica (Soft Delete)
+        # pessoa.is_ativo = False
+        # pessoa.save()
+        # return True
 
     def pesquisar(self, id: Optional[int] = None, termo: Optional[str] = None) -> List[Pessoa]:
+        # Sugestão para implementação futura: filtrar apenas ativos
+        # queryset = Pessoa.objects.filter(is_ativo=True)
         if id:
             return [Pessoa.objects.get(id=id)]
         if termo:
