@@ -60,6 +60,3 @@ Acesse a aplicação em: `http://localhost:4200`
 - [ ] Integração Frontend-Backend (Service)
 - [ ] Implementação das Telas (CRUD)
 - [ ] Estilização com Tailwind CSS
-
----
-Desenvolvido como parte do curso de Desenvolvimento Fullstack.
