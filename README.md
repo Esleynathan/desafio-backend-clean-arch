@@ -115,6 +115,18 @@ A API REST oferece os seguintes endpoints principais para integração:
 
 ## 🏗️ Arquitetura do Projeto
 
+```mermaid
+flowchart TD
+    Client(Frontend Angular) -->|JSON| View(Controller / View)
+    subgraph Django Backend
+        View -->|Data| DTO(DTO / Serializer)
+        DTO -->|Validated Data| Service(Service Layer)
+        Service -->|Business Logic| Task(Task Layer)
+        Task -->|ORM| Model(Model)
+    end
+    Model -->|SQL| DB[(Database)]
+```
+
 O backend foi desenhado para ser escalável, testável e organizado, seguindo o fluxo:
 
 1.  **Controller (Views):** Recebe a requisição HTTP e valida os dados de entrada.
