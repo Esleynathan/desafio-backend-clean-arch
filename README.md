@@ -119,8 +119,9 @@ A API REST oferece os seguintes endpoints principais para integração:
 flowchart TD
     Client(Frontend Angular) -->|JSON| View(Controller / View)
     subgraph Django Backend
-        View -->|Data| DTO(DTO / Serializer)
-        DTO -->|Validated Data| Service(Service Layer)
+        View -->|Data| Serializer(Serializer)
+        Serializer -->|Dict| DTO(DTO)
+        DTO -->|Object| Service(Service Layer)
         Service -->|Business Logic| Task(Task Layer)
         Task -->|ORM| Model(Model)
     end
@@ -130,10 +131,11 @@ flowchart TD
 O backend foi desenhado para ser escalável, testável e organizado, seguindo o fluxo:
 
 1.  **Controller (Views):** Recebe a requisição HTTP e valida os dados de entrada.
-2.  **Service:** Orquestra a lógica de negócio e comunica-se com as Tasks.
-3.  **Task:** Executa operações atômicas e acesso ao banco de dados.
-4.  **DTO:** Garante a integridade e tipagem dos dados trafegados entre camadas.
-5.  **Model:** Representação das tabelas no banco de dados (ORM).
+2.  **Serializer:** Valida os dados da API e converte para formatos Python.
+3.  **DTO:** Objeto de transferência interno que isola a regra de negócio do framework web.
+4.  **Service:** Orquestra a lógica de negócio e comunica-se com as Tasks.
+5.  **Task:** Executa operações atômicas e acesso ao banco de dados.
+6.  **Model:** Representação das tabelas no banco de dados (ORM).
 
 ---
 
