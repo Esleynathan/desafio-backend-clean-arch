@@ -19,8 +19,8 @@ export interface PaginatedResponse<T> {
   providedIn: 'root' // Disponibiliza o serviço para toda a aplicação
 })
 export class PessoaService {
-  // URL da API (ajuste se o prefixo no urls.py principal for diferente de 'api/pessoas')
-  private apiUrl = 'http://localhost:8000/api/pessoas';
+  // URL da API - relativa para funcionar em qualquer ambiente
+  private apiUrl = '/api/pessoas';
 
   constructor(private http: HttpClient) { }
 

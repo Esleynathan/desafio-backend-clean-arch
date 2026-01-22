@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=&9r%&7w&!mrhc409)v6m*^l2@beh*ihum=r7$b#z^&9k3xsf2'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-=&9r%&7w&!mrhc409)v6m*^l2@beh*ihum=r7$b#z^&9k3xsf2')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
@@ -146,3 +146,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
     "https://desafio-gestaopessoas.esleynathan.com.br",
 ]
+
+# CSRF Trusted Origins (necessário para admin em produção com proxy reverso)
+CSRF_TRUSTED_ORIGINS = [
+    "https://desafio-gestaopessoas.esleynathan.com.br",
+]
+
+# Configurações de segurança para produção
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True

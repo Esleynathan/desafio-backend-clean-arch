@@ -20,9 +20,10 @@ services:
       - "8001"
     environment:
       - DJANGO_SETTINGS_MODULE=core.settings
-      - DB_NAME=pessoa_db
-      - DB_USER=admin
-      - DB_PASSWORD=admin
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=${DB_NAME:-pessoa_db}
+      - DB_USER=${DB_USER:-admin}
+      - DB_PASSWORD=${DB_PASSWORD:-admin}
       - DB_HOST=db-pessoas
       - DB_PORT=5432
       - DEBUG=False
