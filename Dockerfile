@@ -41,11 +41,11 @@ RUN pip install --no-cache-dir -r requirements.txt gunicorn whitenoise
 # Copia código do backend
 COPY . .
 
-# Copia frontend compilado do stage anterior
-COPY --from=frontend-builder /app/frontend/dist/frontend-pessoa/browser ./staticfiles/
+# Coleta arquivos estáticos do Django PRIMEIRO
+RUN python manage.py collectstatic --noinput
 
-# Coleta arquivos estáticos do Django
-RUN python manage.py collectstatic --noinput --clear
+# Copia frontend compilado do stage anterior DEPOIS (para não ser sobrescrito)
+COPY --from=frontend-builder /app/frontend/dist/frontend-pessoa/browser ./staticfiles/
 
 # Remove arquivos desnecessários
 RUN rm -rf frontend-pessoa node_modules
