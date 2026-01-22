@@ -19,6 +19,7 @@ services:
     expose:
       - "8001"
     environment:
+      - DJANGO_SETTINGS_MODULE=core.settings
       - DB_NAME=pessoa_db
       - DB_USER=admin
       - DB_PASSWORD=admin
