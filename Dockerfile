@@ -47,6 +47,9 @@ RUN python manage.py collectstatic --noinput
 # Copia frontend compilado do stage anterior DEPOIS (para não ser sobrescrito)
 COPY --from=frontend-builder /app/frontend/dist/frontend-pessoa/browser ./staticfiles/
 
+# Renomeia index.csr.html para index.html (Angular 17+ SSR build)
+RUN if [ -f ./staticfiles/index.csr.html ]; then mv ./staticfiles/index.csr.html ./staticfiles/index.html; fi
+
 # Remove arquivos desnecessários
 RUN rm -rf frontend-pessoa node_modules
 
