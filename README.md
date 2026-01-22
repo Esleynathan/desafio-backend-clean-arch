@@ -24,12 +24,22 @@ Este projeto é uma solução completa para o gerenciamento de cadastro de pesso
 - **Estilização:** Tailwind CSS
 - **Comunicação:** HTTP Client (RxJS)
 
+### Infraestrutura
+- **Containerização:** Docker & Docker Compose
+- **Proxy Reverso:** Traefik (SSL automático via Let's Encrypt)
+- **Deploy:** Digital Ocean Droplet
+
 ## 📋 Pré-requisitos
 
-Antes de começar, certifique-se de ter instalado em sua máquina:
+### Para Desenvolvimento Local
 - Python (3.10 ou superior)
 - Node.js (v20 LTS ou superior)
-- Angular CLI (Instale via `npm install -g @angular/cli`)
+- Angular CLI (`npm install -g @angular/cli`)
+- PostgreSQL
+
+### Para Deploy com Docker
+- Docker & Docker Compose
+- Traefik configurado no servidor
 
 ## 🔧 Instalação e Configuração
 
@@ -61,8 +71,45 @@ Siga os passos abaixo para configurar e executar o projeto em seu ambiente local
     pip install -r requirements.txt
     ```
 
-4.  **Configure o Banco de Dados:**
-    Execute as migrações para criar as tabelas necessárias (o padrão é SQLite, mas suporta PostgreSQL via `.env`).
+4.  **Configure o Banco de Dados (PostgreSQL):**
+
+    O projeto utiliza PostgreSQL como banco de dados. Siga os passos abaixo:
+
+    **a) Instale o PostgreSQL** (caso ainda não tenha):
+    - **Windows:** Baixe em [postgresql.org/download/windows](https://www.postgresql.org/download/windows/)
+    - **Linux (Ubuntu/Debian):** `sudo apt install postgresql postgresql-contrib`
+    - **Mac:** `brew install postgresql`
+
+    **b) Acesse o PostgreSQL e crie o banco de dados:**
+    ```bash
+    # Acesse o terminal do PostgreSQL
+    psql -U postgres
+
+    # Crie o usuário (se necessário)
+    CREATE USER admin WITH PASSWORD 'admin';
+
+    # Crie o banco de dados
+    CREATE DATABASE pessoa_db OWNER admin;
+
+    # Conceda permissões
+    GRANT ALL PRIVILEGES ON DATABASE pessoa_db TO admin;
+
+    # Saia do psql
+    \q
+    ```
+
+    **c) Configure as variáveis de ambiente (opcional):**
+
+    O projeto já possui valores padrão, mas você pode personalizá-los criando um arquivo `.env` na pasta `core/`:
+    ```env
+    DB_NAME=pessoa_db
+    DB_USER=admin
+    DB_PASSWORD=admin
+    DB_HOST=localhost
+    DB_PORT=5432
+    ```
+
+    **d) Execute as migrações para criar as tabelas:**
     ```bash
     python manage.py migrate
     ```
@@ -139,6 +186,47 @@ O backend foi desenhado para ser escalável, testável e organizado, seguindo o 
 
 ---
 
+## 🐳 Deploy com Docker
+
+O projeto está configurado para deploy em produção usando Docker e Traefik.
+
+### Arquitetura de Produção
+
+```
+Internet → Traefik (SSL automático)
+              └── desafio-gestaopessoas.esleynathan.com.br → backend:8001
+```
+
+### Arquivos Docker
+
+| Arquivo | Descrição |
+| :--- | :--- |
+| `Dockerfile` | Multi-stage build: compila Angular + serve com Django/Gunicorn |
+| `docker-compose.yml` | Orquestra PostgreSQL + Backend com labels Traefik |
+| `entrypoint.sh` | Aguarda DB, roda migrations, inicia Gunicorn |
+| `.dockerignore` | Exclui arquivos desnecessários do build |
+
+### Deploy no Servidor
+
+1. **Configure o DNS:**
+   - Crie um registro A apontando para o IP do servidor
+
+2. **Clone e suba os containers:**
+   ```bash
+   git clone https://github.com/Esleynathan/desafio-backend-clean-arch.git
+   cd projeto
+   docker-compose up -d --build
+   ```
+
+3. **Verifique os logs:**
+   ```bash
+   docker-compose logs -f backend-pessoas
+   ```
+
+O Traefik cuida automaticamente do SSL via Let's Encrypt.
+
+---
+
 ## 🗺️ Status do Desenvolvimento
 
 - [x] Configuração do Ambiente
@@ -147,6 +235,7 @@ O backend foi desenhado para ser escalável, testável e organizado, seguindo o 
 - [x] Funcionalidade de Peso Ideal
 - [x] Paginação e Filtros
 - [x] Documentação Completa
+- [x] Dockerização para Produção
 
 ---
 Desenvolvido para avaliação técnica.

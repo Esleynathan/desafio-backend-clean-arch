@@ -1,0 +1,51 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Django
+*.log
+*.pot
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# Node/Frontend (será compilado no Docker)
+frontend-pessoa/node_modules/
+frontend-pessoa/dist/
+frontend-pessoa/.angular/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Ambiente
+.env
+*.env
+core/.env
+
+# Outros
+*.md
+.claude/

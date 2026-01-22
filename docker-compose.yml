@@ -1,0 +1,48 @@
+services:
+  db-pessoas:
+    image: postgres:15-alpine
+    container_name: pessoas-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pessoa_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_pessoas_data:/var/lib/postgresql/data
+    networks:
+      - pessoas-network
+
+  backend-pessoas:
+    build: .
+    container_name: pessoas-backend
+    restart: unless-stopped
+    expose:
+      - "8001"
+    environment:
+      - DB_NAME=pessoa_db
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_HOST=db-pessoas
+      - DB_PORT=5432
+      - DEBUG=False
+      - ALLOWED_HOSTS=desafio-gestaopessoas.esleynathan.com.br,localhost
+    depends_on:
+      - db-pessoas
+    networks:
+      - pessoas-network
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pessoas.rule=Host(`desafio-gestaopessoas.esleynathan.com.br`)"
+      - "traefik.http.routers.pessoas.entrypoints=websecure"
+      - "traefik.http.routers.pessoas.tls.certresolver=letsencrypt"
+      - "traefik.http.services.pessoas.loadbalancer.server.port=8001"
+
+volumes:
+  postgres_pessoas_data:
+
+networks:
+  pessoas-network:
+    driver: bridge
+  traefik-public:
+    external: true
